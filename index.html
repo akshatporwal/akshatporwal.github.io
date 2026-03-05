@@ -270,18 +270,95 @@
     @keyframes rise { to { opacity: 1; transform: translateY(0); } }
 
     /* RESPONSIVE */
+    /* HAMBURGER */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--green);
+      transition: all 0.3s ease;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 5vw 1.5rem;
+      gap: 1.2rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-menu a:last-child { border-bottom: none; color: var(--green); font-weight: 500; }
+
     @media (max-width: 900px) {
+      /* NAV */
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
+      /* HERO */
       #bio { grid-template-columns: 1fr; min-height: auto; }
-      .hero-photo { height: 60vw; }
-      .hero-text { padding: 5rem 6vw 3rem; }
-      .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .hero-photo { height: 70vw; order: -1; }
+      .hero-text { padding: 3rem 6vw 2.5rem; }
+      h1 { font-size: clamp(2.4rem, 8vw, 3.5rem); }
+      .hero-sub { font-size: 0.92rem; max-width: 100%; }
+      .hero-actions { gap: 1.2rem; }
+
+      /* SECTIONS */
+      .section-wrap { padding: 4rem 6vw; }
+      .section-header { flex-direction: column; gap: 0.5rem; margin-bottom: 2.5rem; }
+      .section-eyebrow { margin-top: 0; }
+      h2 { font-size: clamp(1.7rem, 6vw, 2.4rem); }
+
+      /* EXPERIENCE */
+      .exp-item { grid-template-columns: 1fr; gap: 0.3rem; padding: 2rem 0; }
+      .exp-company { font-size: 1.3rem; }
+      .exp-desc { font-size: 0.9rem; max-width: 100%; }
+
+      /* PROJECTS */
       .proj-grid { grid-template-columns: 1fr; }
-      .proj-card { border-right: none; border-bottom: 1px solid var(--border) !important; }
+      .proj-card { border-right: none; border-bottom: 1px solid var(--border) !important; padding: 1.8rem; }
       .proj-card:last-child { border-bottom: none !important; }
-      .edu-grid, .contact-layout { grid-template-columns: 1fr; }
-      nav { flex-wrap: wrap; gap: 1rem; }
-      .nav-links { gap: 1.5rem; }
-      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+
+      /* EDUCATION */
+      .edu-grid { grid-template-columns: 1fr; gap: 2rem; }
+
+      /* CONTACT */
+      .contact-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .contact-copy { font-size: 0.95rem; }
+
+      /* FOOTER */
+      footer { flex-direction: column; gap: 0.4rem; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .top-bar { font-size: 0.62rem; letter-spacing: 0.1em; }
+      .btn-fill, .btn-line { font-size: 0.68rem; }
+      .proj-num { font-size: 2.5rem; }
+      .proj-title { font-size: 1.1rem; }
+      .edu-degree { font-size: 1.2rem; }
+      .contact-link { padding: 1rem 1.2rem; font-size: 0.72rem; }
     }
   </style>
 </head>
@@ -298,7 +375,17 @@
     <li><a href="#education">Education</a></li>
   </ul>
   <a href="#contact" class="nav-cta">Say Hello</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#bio" onclick="closeMobileMenu()">About</a>
+  <a href="#experience" onclick="closeMobileMenu()">Experience</a>
+  <a href="#projects" onclick="closeMobileMenu()">Projects</a>
+  <a href="#education" onclick="closeMobileMenu()">Education</a>
+  <a href="#contact" onclick="closeMobileMenu()">Say Hello</a>
+</div>
 
 <!-- HERO -->
 <section id="bio">
@@ -550,7 +637,4 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 80);
+  const observer = new IntersectionO
