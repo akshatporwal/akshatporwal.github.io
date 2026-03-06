@@ -319,7 +319,8 @@
 
       /* HERO */
       #bio { grid-template-columns: 1fr; min-height: auto; }
-      .hero-photo { height: 70vw; order: -1; }
+      .hero-photo { height: 90vw; max-height: 420px; order: -1; }
+      .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 8%; }
       .hero-text { padding: 3rem 6vw 2.5rem; }
       h1 { font-size: clamp(2.4rem, 8vw, 3.5rem); }
       .hero-sub { font-size: 0.92rem; max-width: 100%; }
@@ -663,6 +664,25 @@
   }
 
   window.addEventListener('scroll', closeMobileMenu);
+
+  // Visitor tracking
+  async function logVisit() {
+    try {
+      const geo = await fetch("https://ipapi.co/json/").then(r => r.json());
+      const params = new URLSearchParams({
+        ip: geo.ip || "",
+        city: geo.city || "",
+        region: geo.region || "",
+        country: geo.country_name || "",
+        org: geo.org || "",
+        ua: navigator.userAgent,
+        ref: document.referrer || "direct",
+        page: window.location.href
+      });
+      fetch("YOUR_APPS_SCRIPT_URL?" + params);
+    } catch(e) {}
+  }
+  logVisit();
 </script>
 </body>
 </html>
