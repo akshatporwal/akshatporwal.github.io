@@ -723,22 +723,26 @@
         // Category
         const cat = (post.categories && post.categories[0]) ? post.categories[0] : 'Essay';
 
-        return `<a class="writing-card reveal" href="${post.link}" target="_blank" rel="noopener">
-          ${thumb ? `<img class="writing-cover" src="${thumb}" alt="${post.title}" onerror="this.style.display='none'"/>` : '<div class="writing-cover" style="background:var(--cream2);"></div>'}
-          <div class="writing-card-body">
-            <div class="writing-card-tag">${cat} &middot; ${mins} min read</div>
-            <div class="writing-card-title">${post.title}</div>
-            <p class="writing-card-desc">${excerpt}</p>
-            <span class="writing-card-meta">${dateStr}</span>
-          </div>
-        </a>`;
+        var imgHtml = thumb
+          ? '<img class="writing-cover" src="' + thumb + '" alt="' + post.title.replace(/"/g, '') + '" onerror="this.style.display=\'none\'"/>'
+          : '<div class="writing-cover" style="background:var(--cream2);"></div>';
+
+        return '<a class="writing-card reveal" href="' + post.link + '" target="_blank" rel="noopener">' +
+          imgHtml +
+          '<div class="writing-card-body">' +
+            '<div class="writing-card-tag">' + cat + ' &middot; ' + mins + ' min read</div>' +
+            '<div class="writing-card-title">' + post.title + '</div>' +
+            '<p class="writing-card-desc">' + excerpt + '</p>' +
+            '<span class="writing-card-meta">' + dateStr + '</span>' +
+          '</div>' +
+        '</a>';
       }).join('');
 
       // Trigger reveal animations on new cards
       document.querySelectorAll('#writing-grid .reveal').forEach(el => observer.observe(el));
 
     } catch(e) {
-      grid.innerHTML = '<div style="color:var(--muted)">Couldn't load posts right now — <a href="https://akshat-porwal.medium.com" target="_blank" style="color:var(--green)">read on Medium</a>.</div>';
+      grid.innerHTML = '<div style="color:var(--muted)">Couldn\'t load posts right now \u2014 <a href="https://akshat-porwal.medium.com" target="_blank" style="color:var(--green)">read on Medium</a>.</div>';
     }
   }
   loadMediumPosts();
