@@ -373,6 +373,7 @@
     <li><a href="#bio">About</a></li>
     <li><a href="#experience">Experience</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#writing">Writing</a></li>
     <li><a href="#education">Education</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -385,6 +386,7 @@
   <a href="#bio" onclick="closeMobileMenu()">About</a>
   <a href="#experience" onclick="closeMobileMenu()">Experience</a>
   <a href="#projects" onclick="closeMobileMenu()">Projects</a>
+  <a href="#writing" onclick="closeMobileMenu()">Writing</a>
   <a href="#education" onclick="closeMobileMenu()">Education</a>
   <a href="#contact" onclick="closeMobileMenu()">Say Hello</a>
 </div>
@@ -568,6 +570,27 @@
   </div>
 </section>
 
+<!-- WRITING -->
+<section id="writing">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <span class="section-eyebrow">Writing</span>
+      <h2>Well-<em>Calibrated</em></h2>
+    </div>
+    <p class="reveal" style="color:var(--muted);font-size:1rem;margin-bottom:2.5rem;max-width:520px;line-height:1.85;">
+      I write about data, fintech, startups, and the questions worth asking.
+      On data science in the wild, how ML actually works inside product teams,
+      and the occasional rabbit hole that turns out to be more interesting than anything on my reading list.
+    </p>
+    <div class="writing-grid" id="writing-grid">
+      <div style="grid-column:1/-1;color:var(--muted);font-size:0.9rem;padding:1rem 0;">Loading posts...</div>
+    </div>
+    <p class="writing-more reveal">
+      Read more at <a href="https://akshat-porwal.medium.com" target="_blank" rel="noopener">Well-Calibrated on Medium &rarr;</a>
+    </p>
+  </div>
+</section>
+
 <!-- EDUCATION -->
 <section id="education">
   <div class="section-wrap">
@@ -666,55 +689,56 @@
 
   window.addEventListener('scroll', closeMobileMenu);
 
-  // Dynamic Medium posts
+  // Dynamic Medium posts via RSS
   async function loadMediumPosts() {
     const grid = document.getElementById('writing-grid');
     try {
-      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fmedium.com%2Ffeed%2F%40akshat-porwal&api_key=free&count=3');
-      const data = await res.json();
+      const rss = 'https://medium.com/feed/@akshat-porwal';
+      const api = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss) + '&api_key=&count=3';
+      const data = await fetch(api).then(r => r.json());
 
-      if (!data.items || data.items.length === 0) {
-        grid.innerHTML = '<p style="color:var(--muted)">No posts found.</p>';
+      if (!data.items || !data.items.length) {
+        grid.innerHTML = '<div style="color:var(--muted)">No posts yet.</div>';
         return;
       }
 
-      grid.innerHTML = data.items.map(post => {
-        // Extract thumbnail from content
-        const thumbMatch = post.thumbnail ||
-          (post.content && post.content.match(/<img[^>]+src=["']([^"']+)["']/)?.[1]) ||
-          '';
+      grid.innerHTML = data.items.slice(0, 3).map(post => {
+        // Get thumbnail from medium's thumbnail field or first img in content
+        const thumb = post.thumbnail ||
+          (post.content || '').match(/<img[^>]+src=["']([^"']+)["']/i)?.[1] || '';
 
-        // Extract plain text description
-        const div = document.createElement('div');
-        div.innerHTML = post.description || '';
-        const desc = (div.textContent || '').slice(0, 120).trim() + '...';
+        // Plain text excerpt
+        const tmp = document.createElement('div');
+        tmp.innerHTML = post.description || '';
+        const excerpt = (tmp.textContent || '').trim().slice(0, 130) + '...';
 
-        // Format date
+        // Date
         const date = new Date(post.pubDate);
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-        // Estimate read time
-        const words = (div.textContent || '').split(' ').length;
-        const mins = Math.max(1, Math.round(words / 200));
+        // Read time estimate
+        const wordCount = (tmp.textContent || '').split(/\s+/).length;
+        const mins = Math.max(1, Math.round(wordCount / 200));
 
-        return \`
-          <a class="writing-card reveal" href="\${post.link}" target="_blank" rel="noopener">
-            \${thumbMatch ? \`<img class="writing-cover" src="\${thumbMatch}" alt="\${post.title}" onerror="this.style.display='none'"/>\` : '<div class="writing-cover" style="background:var(--cream2);"></div>'}
-            <div class="writing-card-body">
-              <div class="writing-card-tag">\${post.categories?.[0] || 'Essay'} &middot; \${mins} min read</div>
-              <div class="writing-card-title">\${post.title}</div>
-              <p class="writing-card-desc">\${desc}</p>
-              <span class="writing-card-meta">\${dateStr}</span>
-            </div>
-          </a>
-        \`;
+        // Category
+        const cat = (post.categories && post.categories[0]) ? post.categories[0] : 'Essay';
+
+        return `<a class="writing-card reveal" href="${post.link}" target="_blank" rel="noopener">
+          ${thumb ? `<img class="writing-cover" src="${thumb}" alt="${post.title}" onerror="this.style.display='none'"/>` : '<div class="writing-cover" style="background:var(--cream2);"></div>'}
+          <div class="writing-card-body">
+            <div class="writing-card-tag">${cat} &middot; ${mins} min read</div>
+            <div class="writing-card-title">${post.title}</div>
+            <p class="writing-card-desc">${excerpt}</p>
+            <span class="writing-card-meta">${dateStr}</span>
+          </div>
+        </a>`;
       }).join('');
 
-      // Re-run reveal observer on new elements
-      document.querySelectorAll('.writing-card.reveal').forEach(el => observer.observe(el));
+      // Trigger reveal animations on new cards
+      document.querySelectorAll('#writing-grid .reveal').forEach(el => observer.observe(el));
 
     } catch(e) {
-      grid.innerHTML = '<p style="color:var(--muted)">Couldn\'t load posts right now.</p>';
+      grid.innerHTML = '<div style="color:var(--muted)">Couldn't load posts right now — <a href="https://akshat-porwal.medium.com" target="_blank" style="color:var(--green)">read on Medium</a>.</div>';
     }
   }
   loadMediumPosts();
